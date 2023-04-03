@@ -43,16 +43,13 @@ class AuthController extends Controller
             ], 401);
         }
 
-
-        $tokenResult = $user->createToken('Personal Access Token');
+        $tokenResult = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'login successful',
             'user' => $user,
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
+            'access_token' => $tokenResult
         ]);
     }
 
@@ -75,6 +72,7 @@ class AuthController extends Controller
             $user = new User([
                 'name' => $request->name,
                 'email' => $request->email,
+                'phone' => $request->phone,
                 'password' => Hash::make($request->password)
             ]);
 
@@ -93,7 +91,7 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
+        auth()->user()->tokens()->delete();
 
         return response()->json([
             'success' => true,
