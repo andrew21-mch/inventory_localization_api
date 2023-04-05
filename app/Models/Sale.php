@@ -8,4 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Sale extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'component_id',
+        'quantity',
+        'price',
+        'total',
+        'date',
+    ];
+
+    public function component()
+    {
+        return $this->belongsTo(Component::class);
+    }
+
 }
