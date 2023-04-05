@@ -1,7 +1,7 @@
 # Localization Api
 
 ## Description
-check the [description](DESCRIPTION.md) file
+check the [description](DESCRIPTION.MD) file
 
 ## Project Setup:
 
