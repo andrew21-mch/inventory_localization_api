@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Hash;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
     public function login(Request $request)
     {
         $validators = Validator::make($request->all(), [
@@ -19,28 +21,17 @@ class AuthController extends Controller
         ]);
 
         if ($validators->fails()) {
-            return response()->json([
-                'message' => 'some fields are not valid',
-                'errors' => $validators->errors()
-            ], 422);
+           ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
         }
 
         $user = User::where('phone', $request->phone)->first();
 
         if (!$user) {
-            return response()->json([
-                'error' => 'unauthorized',
-                'success' => false,
-                'message' => 'sorry, we can\'t find this user'
-            ], 404);
+            return ApiResponse::errorResponse('sorry, we can\'t find this user', null, 401);
         }
 
         if (!Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'error' => 'unauthorized',
-                'success' => false,
-                'message' => 'sorry, your password is incorrect'
-            ], 401);
+            return ApiResponse::errorResponse('sorry, password is incorrect', null, 401);
         }
 
         $tokenResult = $user->createToken('authToken')->plainTextToken;
@@ -62,10 +53,7 @@ class AuthController extends Controller
         ]);
 
         if ($validators->fails()) {
-            return response()->json([
-                'message' => 'some fields are not valid',
-                'errors' => $validators->errors()
-            ], 422);
+            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
         }
 
         try{
@@ -78,25 +66,16 @@ class AuthController extends Controller
 
             $user->save();
 
-            return response()->json([
-                'message' => 'Successfully created user!',
-                'user' => $user
-            ], 201);
+            return ApiResponse::successResponse('user created successfully', $user, 201);
         }catch(\Exception $e){
-            return response()->json([
-                'message' => 'Failed to create user!',
-                'error' => $e->getMessage()
-            ], 500);
+            return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
     }
     public function logout(Request $request)
     {
         auth()->user()->tokens()->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Successfully logged out'
-        ]);
+        return ApiResponse::successResponse('logged out successfully', null, 200);
     }
 
     public function user(Request $request)
