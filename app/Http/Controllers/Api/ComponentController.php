@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Component;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -135,6 +136,27 @@ class ComponentController extends Controller
         }catch(\Exception $e){
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
+    }
+
+    /**
+     * search for a component
+     */
+    public function search(Request $request)
+    {
+        $component = Component::where('name', 'LIKE', "%{$request->search}%")
+        ->orWhere('description', 'LIKE', "%{$request->search}%")
+        ->orWhere('quantity', 'LIKE', "%{$request->search}%")
+        ->orWhere('price_per_unit', 'LIKE', "%{$request->search}%")
+        ->orWhere('price', 'LIKE', "%{$request->search}%")
+        ->orWhereHas('suppliers', function($query) use ($request){
+            $query->where('name', 'LIKE', "%{$request->search}%")
+            ->orWhere('email', 'LIKE', "%{$request->search}%")
+            ->orWhere('phone', 'LIKE', "%{$request->search}%")
+            ->orWhere('address', 'LIKE', "%{$request->search}%");
+        })->get();
+
+        return ApiResponse::successResponse('component fetched successfully', $component, 200);
+
     }
 
     /**

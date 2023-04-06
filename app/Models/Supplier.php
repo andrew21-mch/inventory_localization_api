@@ -16,6 +16,11 @@ class Supplier extends Model
         'address',
     ];
 
+    public function components()
+    {
+        return $this->hasMany(Component::class);
+    }
+
 
 
 }

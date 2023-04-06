@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
+    use ApiResponse;
     /**
      * Store a newly created resource in storage.
      */
@@ -28,7 +24,10 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::find($id);
+        if(!$user){
+            return ApiResponse::errorResponse('user not found', null, 404);
+        }
     }
 
     /**
@@ -36,7 +35,17 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::find($id);
+        if(!$user){
+            return ApiResponse::errorResponse('user not found', null, 404);
+        }
+
+        try{
+            $user->update($request->all());
+            return ApiResponse::successResponse('user updated successfully', $user, 200);
+        }catch(\Exception $e){
+            return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
+        }
     }
 
     /**
