@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Component;
+use App\Models\OutOfStock;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -143,7 +144,7 @@ class ComponentController extends Controller
      */
     public function search(Request $request)
     {
-        $component = Component::where('name', 'LIKE', "%{$request->search}%")
+        $components = Component::where('name', 'LIKE', "%{$request->search}%")
         ->orWhere('description', 'LIKE', "%{$request->search}%")
         ->orWhere('quantity', 'LIKE', "%{$request->search}%")
         ->orWhere('price_per_unit', 'LIKE', "%{$request->search}%")
@@ -155,6 +156,17 @@ class ComponentController extends Controller
             ->orWhere('address', 'LIKE', "%{$request->search}%");
         })->get();
 
+        if($components){
+            foreach($components as $component){
+                if($component->quantiry < 10){
+                    OutOfStock::create([
+                        'component_id' => $component->id,
+                        'quantity' => $component->quantity,
+                        'date' => date('Y-m-d'),
+                    ]);
+                }
+            }
+        }
         return ApiResponse::successResponse('component fetched successfully', $component, 200);
 
     }
