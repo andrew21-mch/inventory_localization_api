@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\OutOfStock;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class OutOfStockController extends Controller
@@ -22,27 +23,22 @@ class OutOfStockController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public static function store($component_id, $supplier_id=null)
     {
-        $validators = \Illuminate\Support\Facades\Validator::make($request->all(), [
-            'component_id' => 'required|integer',
-            'quantity' => 'required|integer',
-            'reason' => 'required|string',
-        ]);
-
-        if ($validators->fails()) {
-            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
-        }
-
         try{
+            if($supplier_id){
+                $supplier = Supplier::find($supplier_id);
+                if(!$supplier){
+                    return ['status' => false, 'message' => 'supplier not found'];
+                }
+            }
             $out_of_stock = OutOfStock::create([
-                'component_id' => $request->component_id,
-                'quantity' => $request->quantity,
-                'reason' => $request->reason,
+                'component_id' => $component_id,
+                'supplier_id' => $supplier_id,
             ]);
-            return ApiResponse::successResponse('out of stock created successfully', $out_of_stock, 201);
+            return ['status' => true, 'message' => 'out of stock created successfully', 'data' => $out_of_stock];
         }catch(\Exception $e){
-            return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
+            return ['status' => false, 'message' => 'something went wrong', 'data' => $e->getMessage()];
         }
     }
 

@@ -26,9 +26,7 @@ class SupplierController extends Controller
     {
         $validators = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required|string',
-            'email' => 'required|email',
             'phone' => 'required|string',
-            'address' => 'required|string',
         ]);
 
         if ($validators->fails()) {

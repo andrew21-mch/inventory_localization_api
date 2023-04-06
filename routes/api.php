@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\OutOfStockController;
+use App\Http\Controllers\Api\StatisticsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -68,10 +70,6 @@ Route::get('/', function () {
 
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 
@@ -80,34 +78,49 @@ Route::group(['prefix' => 'auth', 'middleware' => 'auth:sanctum'], function () {
     Route::get('user', [AuthController::class, 'user']);
 });
 
-Route::group(['prefix' => 'components', 'middleware' => 'auth:sanctum'], function () {
-    Route::get('/', [ComponentController::class, 'index']);
-    Route::get('/{id}', [ComponentController::class, 'show']);
-    Route::post('/', [ComponentController::class, 'store']);
-    Route::put('/{id}', [ComponentController::class, 'update']);
-    Route::delete('/{id}', [ComponentController::class, 'destroy']);
-});
+Route::middleware('auth:sanctum')->group(function () {
 
-Route::group(['prefix' => 'restocks', 'middleware' => 'auth:sanctum'], function () {
-    Route::get('/', [RestockController::class, 'index']);
-    Route::get('/{id}', [RestockController::class, 'show']);
-    Route::post('/', [RestockController::class, 'store']);
-    Route::put('/{id}', [RestockController::class, 'update']);
-    Route::delete('/{id}', [RestockController::class, 'destroy']);
-});
+    Route::group(['prefix' => 'components'], function () {
+        Route::get('/', [ComponentController::class, 'index']);
+        Route::get('/{id}', [ComponentController::class, 'show']);
+        Route::get('/search/component', [ComponentController::class, 'search']);
+        Route::post('/', [ComponentController::class, 'store']);
+        Route::put('/{id}', [ComponentController::class, 'update']);
+        Route::delete('/{id}', [ComponentController::class, 'destroy']);
+    });
 
-Route::group(['prefix' => 'sales', 'middleware' => 'auth:sanctum'], function () {
-    Route::get('/', [SaleController::class, 'index']);
-    Route::get('/{id}', [SaleController::class, 'show']);
-    Route::post('/', [SaleController::class, 'store']);
-    Route::put('/{id}', [SaleController::class, 'update']);
-    Route::delete('/{id}', [SaleController::class, 'destroy']);
-});
+    Route::group(['prefix' => 'restocks'], function () {
+        Route::get('/', [RestockController::class, 'index']);
+        Route::get('/{id}', [RestockController::class, 'show']);
+        Route::post('/', [RestockController::class, 'store']);
+        Route::put('/{id}', [RestockController::class, 'update']);
+        Route::delete('/{id}', [RestockController::class, 'destroy']);
+    });
 
-Route::group(['prefix' => 'suppliers', 'middleware' => 'auth:sanctum'], function () {
-    Route::get('/', [SupplierController::class, 'index']);
-    Route::get('/{id}', [SupplierController::class, 'show']);
-    Route::post('/', [SupplierController::class, 'store']);
-    Route::put('/{id}', [SupplierController::class, 'update']);
-    Route::delete('/{id}', [SupplierController::class, 'destroy']);
+    Route::group(['prefix' => 'sales'], function () {
+        Route::get('/', [SaleController::class, 'index']);
+        Route::get('/{id}', [SaleController::class, 'show']);
+        Route::post('/', [SaleController::class, 'store']);
+        Route::put('/{id}', [SaleController::class, 'update']);
+        Route::delete('/{id}', [SaleController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'suppliers'], function () {
+        Route::get('/', [SupplierController::class, 'index']);
+        Route::get('/{id}', [SupplierController::class, 'show']);
+        Route::post('/', [SupplierController::class, 'store']);
+        Route::put('/{id}', [SupplierController::class, 'update']);
+        Route::delete('/{id}', [SupplierController::class, 'destroy']);
+    });
+
+    Route::prefix('out_of_stocks')->group(function () {
+        Route::get('/', [OutOfStockController::class, 'index']);
+    });
+
+
+    Route::prefix('statistics')->group(function () {
+        Route::get('/', [StatisticsController::class, 'statistics']);
+        Route::get('/sales', [StatisticsController::class, 'sales_statistics']);
+    });
+
 });
