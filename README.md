@@ -40,6 +40,9 @@ php artisan serve
 flutter run
 ```
 
+## API Documentation:
+
+The API documentation can be found [here](https://documenter.getpostman.com/view/17184783/2s93RZMVfD)
 ## Contributing:
 
 We welcome contributions from anyone interested in improving the system. To contribute, please fork the repository and submit a pull request with your changes.
