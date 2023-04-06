@@ -12,9 +12,7 @@ class Sale extends Model
     protected $fillable = [
         'component_id',
         'quantity',
-        'price',
-        'total',
-        'date',
+        'total_price'
     ];
 
     public function component()

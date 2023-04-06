@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Component;
 use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -26,25 +27,32 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         $validators = Validator::make($request->all(), [
-            'name' => 'required|string',
+            'component_id' => 'required|integer',
             'quantity' => 'required|integer',
-            'price' => 'required|integer',
-            'total' => 'required|integer',
         ]);
 
         if ($validators->fails()) {
             return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
         }
 
+        $component = Component::find($request->component_id);
+        if(!$component){
+            return ApiResponse::errorResponse('component not found', null, 404);
+        }
+
+        \DB::beginTransaction();
         try{
             $sale = Sale::create([
-                'name' => $request->name,
+                'component_id' => $request->component_id,
                 'quantity' => $request->quantity,
-                'price' => $request->price,
-                'total' => $request->total,
+                'total_price' => $request->quantity * $component->price_per_unit,
             ]);
+            $component->quantity -= $request->quantity;
+            $component->save();
+            \DB::commit();
             return ApiResponse::successResponse('sale created successfully', $sale, 201);
         }catch(\Exception $e){
+            \DB::rollBack();
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
 

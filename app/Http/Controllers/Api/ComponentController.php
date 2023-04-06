@@ -31,7 +31,7 @@ class ComponentController extends Controller
             'name' => 'required|string',
             'quantity' => 'required|integer',
             'description' => 'required|string',
-            'price_per_unit' => 'required|integer',
+            'price_per_unit' => 'required',
         ]);
 
         if ($validators->fails()) {
@@ -66,7 +66,7 @@ class ComponentController extends Controller
             $component = Component::create([
                 'name' => $request->name,
                 'quantity' => $request->quantity,
-                'price_per_unit' => $request->price,
+                'price_per_unit' => $request->price_per_unit,
                 'image' => $name,
                 'slug' => self::createSlug($request->name),
                 'description' => $request->description,
