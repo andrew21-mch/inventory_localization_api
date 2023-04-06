@@ -12,7 +12,6 @@ class Restock extends Model
     protected $fillable = [
         'component_id',
         'quantity',
-        'date',
     ];
 
     public function component()
@@ -20,5 +19,5 @@ class Restock extends Model
         return $this->belongsTo(Component::class);
     }
 
-    
+
 }

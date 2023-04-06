@@ -18,8 +18,8 @@ class ComponentController extends Controller
      */
     public function index()
     {
-        $componets = Component::all();
-        return ApiResponse::successResponse('components fetched successfully', $componets, 200);
+        $components = Component::with('supplier')->get();
+        return ApiResponse::successResponse('components fetched successfully', $components, 200);
     }
 
     /**
@@ -30,14 +30,15 @@ class ComponentController extends Controller
         $validators = Validator::make($request->all(), [
             'name' => 'required|string',
             'quantity' => 'required|integer',
-            'price' => 'required|integer',
-            'total' => 'required|integer',
+            'description' => 'required|string',
+            'price_per_unit' => 'required|integer',
         ]);
 
         if ($validators->fails()) {
             return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
         }
 
+        $name = null;
         if($request->hasFile('image')){
             $image = $request->file('image');
             $name = time().'.'.$image->getClientOriginalExtension();
@@ -45,15 +46,36 @@ class ComponentController extends Controller
             $image->move($destinationPath, $name);
         }
 
+        \DB::beginTransaction();
         try{
+            if($request->supplier_id){
+                $supplier = Supplier::find($request->supplier_id);
+                if(!$supplier){
+                    return ApiResponse::errorResponse('supplier not found', null, 404);
+                }
+            }
+
+            if(!$request->supplier_id && $request->add_supplier){
+                $supplier = Supplier::create([
+                    'name' => $request->supplier_name,
+                    'phone' => $request->supplier_phone,
+                    'email' => $request->supplier_email,
+                    'address' => $request->supplier_address,
+                ]);
+            }
             $component = Component::create([
                 'name' => $request->name,
                 'quantity' => $request->quantity,
-                'price' => $request->price,
+                'price_per_unit' => $request->price,
                 'image' => $name,
                 'slug' => self::createSlug($request->name),
-                'total' => $request->total,
+                'description' => $request->description,
+                'supplier_id' => $request->supplier_id ?? $supplier->id,
+
             ]);
+
+            \DB::commit();
+
             return ApiResponse::successResponse('component created successfully', $component, 201);
         }catch(\Exception $e){
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
@@ -80,20 +102,11 @@ class ComponentController extends Controller
     {
         $component = Component::find($id);
         if(!$component){
+
             return ApiResponse::errorResponse('component not found', null, 404);
         }
 
-        $validators = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'quantity' => 'required|integer',
-            'price' => 'required|integer',
-            'total' => 'required|integer',
-        ]);
-
-        if ($validators->fails()) {
-            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
-        }
-
+        $name = $component->image;
         if($request->hasFile('image')){
             $image = $request->file('image');
             $name = time().'.'.$image->getClientOriginalExtension();
@@ -105,18 +118,20 @@ class ComponentController extends Controller
             }
         }
 
+        \DB::beginTransaction();
         try{
             $component->update([
                 'name' => $request->name,
                 'quantity' => $request->quantity,
-                'price' => $request->price,
+                'price_per_unit' => $request->price,
                 'image' => $name,
-                'slug' => self::createSlug($request->name),
-                'total' => $request->total,
-            ]);
+                'slug' => \Str::slug($request->name),
 
+            ]);
+            \DB::commit();
             return ApiResponse::successResponse('component updated successfully', $component, 200);
         }catch(\Exception $e){
+            \DB::rollBack();
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
     }
@@ -131,10 +146,13 @@ class ComponentController extends Controller
             ApiResponse::errorResponse('component not found', null, 404);
         }
 
+        \DB::beginTransaction();
         try{
             $component->delete();
+            \DB::commit();
             return ApiResponse::successResponse('component deleted successfully', null, 200);
         }catch(\Exception $e){
+            \DB::rollBack();
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
     }
@@ -148,26 +166,34 @@ class ComponentController extends Controller
         ->orWhere('description', 'LIKE', "%{$request->search}%")
         ->orWhere('quantity', 'LIKE', "%{$request->search}%")
         ->orWhere('price_per_unit', 'LIKE', "%{$request->search}%")
-        ->orWhere('price', 'LIKE', "%{$request->search}%")
-        ->orWhereHas('suppliers', function($query) use ($request){
+        ->orWhereHas('supplier', function($query) use ($request){
             $query->where('name', 'LIKE', "%{$request->search}%")
-            ->orWhere('email', 'LIKE', "%{$request->search}%")
-            ->orWhere('phone', 'LIKE', "%{$request->search}%")
-            ->orWhere('address', 'LIKE', "%{$request->search}%");
+            ->orWhere('phone', 'LIKE', "%{$request->search}%");
         })->get();
 
         if($components){
             foreach($components as $component){
-                if($component->quantiry < 10){
-                    OutOfStock::create([
-                        'component_id' => $component->id,
-                        'quantity' => $component->quantity,
-                        'date' => date('Y-m-d'),
-                    ]);
+                if($component->quantity <= 10){
+                    try
+                    {
+                        $outOfStock = OutOfStock::where('component_id', $component->id)->first();
+                        if($outOfStock){
+                            $outOfStock->update([
+                                'component_id' => $component->id,
+                                'supplier_id' => $component->supplier_id,
+                            ]);
+                        }else{
+                            OutOfStockController::store($component->id, $component->supplier_id);
+                        }
+                    }
+                    catch(\Exception $e)
+                    {
+                        return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
+                    }
                 }
             }
         }
-        return ApiResponse::successResponse('component fetched successfully', $component, 200);
+        return ApiResponse::successResponse('component fetched successfully', $components, 200);
 
     }
 

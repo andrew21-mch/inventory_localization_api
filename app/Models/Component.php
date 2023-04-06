@@ -14,9 +14,14 @@ class Component extends Model
         'description',
         'quantity',
         'image',
+        'slug',
         'price_per_unit',
-        'price',
         'supplier_id',
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 
 }

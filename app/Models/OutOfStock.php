@@ -11,8 +11,7 @@ class OutOfStock extends Model
 
     protected $fillable = [
         'component_id',
-        'quantity',
-        'date',
+        'supplier_id',
     ];
 
     public function component()
