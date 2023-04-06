@@ -76,4 +76,53 @@ class StatisticsController extends Controller
 
         return ApiResponse::successResponse('sales statistics fetched successfully', $sales, 200);
     }
+
+    public function sales_statistics_by_date(Request $request)
+    {
+        $validators = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'from' => 'required|date',
+            'to' => 'required|date',
+        ]);
+
+        if ($validators->fails()) {
+            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
+        }
+
+        $sales = \App\Models\Sale::with('component')->whereBetween('created_at', [$request->from, $request->to])->get();
+
+        $sales = $sales->groupBy('component_id')->map(function ($item) {
+            return [
+                'component_id' => $item[0]->component_id,
+                'component_name' => $item[0]->component->name,
+                'quantity' => $item->sum('quantity'),
+                'total_price' => $item->sum('total_price')
+            ];
+        });
+
+        return ApiResponse::successResponse('sales statistics fetched successfully', $sales, 200);
+    }
+
+    public function restocks_statistics_by_date(Request $request)
+    {
+        $validators = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'from' => 'required|date',
+            'to' => 'required|date',
+        ]);
+
+        if ($validators->fails()) {
+            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
+        }
+
+        $restocks = Restock::with('component')->whereBetween('created_at', [$request->from, $request->to])->get();
+
+        $restocks = $restocks->groupBy('component_id')->map(function ($item) {
+            return [
+                'component_id' => $item[0]->component_id,
+                'component_name' => $item[0]->component->name,
+                'quantity' => $item->sum('quantity'),
+            ];
+        });
+
+        return ApiResponse::successResponse('restocks statistics fetched successfully', $restocks, 200);
+    }
 }
