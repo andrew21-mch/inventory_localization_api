@@ -67,6 +67,7 @@ class ComponentController extends Controller
                 'name' => $request->name,
                 'quantity' => $request->quantity,
                 'price_per_unit' => $request->price_per_unit,
+                'cost_price_per_unit' => $request->cost_price_per_unit,
                 'image' => $name,
                 'slug' => self::createSlug($request->name),
                 'description' => $request->description,
@@ -124,6 +125,8 @@ class ComponentController extends Controller
                 'name' => $request->name,
                 'quantity' => $request->quantity,
                 'price_per_unit' => $request->price,
+                'cost_price_per_unit' => $request->cost_price,
+                'description' => $request->description,
                 'image' => $name,
                 'slug' => \Str::slug($request->name),
 
@@ -166,6 +169,7 @@ class ComponentController extends Controller
         ->orWhere('description', 'LIKE', "%{$request->search}%")
         ->orWhere('quantity', 'LIKE', "%{$request->search}%")
         ->orWhere('price_per_unit', 'LIKE', "%{$request->search}%")
+        ->orWhere('cost_price_per_unit', 'LIKE', "%{$request->search}%")
         ->orWhereHas('supplier', function($query) use ($request){
             $query->where('name', 'LIKE', "%{$request->search}%")
             ->orWhere('phone', 'LIKE', "%{$request->search}%");
