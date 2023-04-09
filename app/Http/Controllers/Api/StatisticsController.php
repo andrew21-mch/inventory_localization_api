@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Component;
 use App\Models\OutOfStock;
 use App\Models\Restock;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 
 class StatisticsController extends Controller
@@ -29,6 +30,17 @@ class StatisticsController extends Controller
             ];
         });
 
+        $generated_profit_per_component = Sale::with('component')->get();
+
+        $generated_profit_per_component = $generated_profit_per_component->groupBy('component_id')->map(function ($item) {
+            return [
+                'component_id' => $item[0]->component_id,
+                'component_name' => $item[0]->component->name,
+                'quantity' => $item->sum('quantity'),
+                'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
+
+            ];
+        });
 
         $restocks = Restock::with('component')->get();
 
@@ -40,6 +52,7 @@ class StatisticsController extends Controller
             ];
         });
 
+        $total_profits = $generated_profit_per_component->sum('profit');
 
 
         return ApiResponse::successResponse('statistics fetched successfully', [
@@ -48,29 +61,23 @@ class StatisticsController extends Controller
             'total_components' => $total_components,
             'component_with_their_quantity' => $component_with_their_quantity,
             'restocks_quantity_with_dates' => $restocks_quantity_with_dates,
+            'generated_profit_per_component' => $generated_profit_per_component,
+            'total_profit' => $total_profits,
         ], 200);
     }
 
     public function sales_statistics()
     {
-        $sales = \App\Models\Sale::with('component')->get();
-
-        $last_10_sales_by_date_with_item_quantity_and_total_price = $sales->take(20)->map(function ($item) {
-            return [
-                'component_id' => $item->component_id,
-                'component_name' => $item->component->name,
-                'quantity' => $item->quantity,
-                'total_price' => $item->price_per_unit * $item->quantity,
-                'created_at' => $item->created_at,
-            ];
-        });
+        $sales = Sale::with('component')->get();
 
         $sales = $sales->groupBy('component_id')->map(function ($item) {
             return [
                 'component_id' => $item[0]->component_id,
                 'component_name' => $item[0]->component->name,
                 'quantity' => $item->sum('quantity'),
-                'total_price' => $item->sum('price_per_unit') * $item->sum('quantity'),
+                'total_price' => $item->sum('total_price'),
+                'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
+
             ];
         });
 
@@ -88,14 +95,15 @@ class StatisticsController extends Controller
             return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
         }
 
-        $sales = \App\Models\Sale::with('component')->whereBetween('created_at', [$request->from, $request->to])->get();
+        $sales = Sale::with('component')->whereBetween('created_at', [$request->from, $request->to])->get();
 
         $sales = $sales->groupBy('component_id')->map(function ($item) {
             return [
                 'component_id' => $item[0]->component_id,
                 'component_name' => $item[0]->component->name,
                 'quantity' => $item->sum('quantity'),
-                'total_price' => $item->sum('total_price')
+                'total_price' => $item->sum('total_price'),
+                'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
             ];
         });
 
@@ -124,5 +132,10 @@ class StatisticsController extends Controller
         });
 
         return ApiResponse::successResponse('restocks statistics fetched successfully', $restocks, 200);
+    }
+
+    public function calculateProfie($cost, $price, $quantity)
+    {
+        return ($price * $quantity) - ($cost * $quantity);
     }
 }
