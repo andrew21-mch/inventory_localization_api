@@ -121,6 +121,7 @@ class ComponentController extends Controller
 
         \DB::beginTransaction();
         try{
+
             $component->update([
                 'name' => $request->name,
                 'quantity' => $request->quantity,
@@ -129,6 +130,7 @@ class ComponentController extends Controller
                 'description' => $request->description,
                 'image' => $name,
                 'slug' => \Str::slug($request->name),
+                'led_id' => $request->led_id
 
             ]);
             \DB::commit();
@@ -144,7 +146,7 @@ class ComponentController extends Controller
      */
     public function destroy($id)
     {
-        $component = Component::find($id);
+        $component = Component::with('led')->find($id);
         if(!$component){
             ApiResponse::errorResponse('component not found', null, 404);
         }
@@ -173,7 +175,7 @@ class ComponentController extends Controller
         ->orWhereHas('supplier', function($query) use ($request){
             $query->where('name', 'LIKE', "%{$request->search}%")
             ->orWhere('phone', 'LIKE', "%{$request->search}%");
-        })->get();
+        })->with('led')->get();
 
         if($components){
             foreach($components as $component){

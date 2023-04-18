@@ -24,4 +24,11 @@ class Component extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function led()
+    {
+        return $this->belongsTo(Led::class);
+    }
+
+
+
 }

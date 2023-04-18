@@ -21,6 +21,7 @@ return new class extends Migration
             $table->double('price_per_unit')->nullable();
             $table->integer('quantity')->nullable();
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->onDelete('cascade');
+            $table->foreignId('led_id')->nullable()->constrained('leds')->onDelete('cascade');
             $table->timestamps();
         });
     }

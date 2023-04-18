@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Led;
 use Illuminate\Http\Request;
 
 class LEDController extends Controller
@@ -64,5 +65,10 @@ class LEDController extends Controller
         ]);
     }
 
-    
+
+    // crud LEDs
+    public function index(){
+        $leds = Led::all();
+    }
+
 }
