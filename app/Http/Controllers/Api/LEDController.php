@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Led;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LEDController extends Controller
 {
@@ -50,25 +52,69 @@ class LEDController extends Controller
     // install led
     public function installLED(Request $request)
     {
-        $url = 'http://localhost:3000/led/install';
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request('POST', $url, [
-            'form_params' => [
-                'led' => $request->led_number
-            ]
+        $validators = Validator::make($request->all(), [
+            'shelf_number' => 'required',
+            'led_unique_number' => 'required'
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'led installed successfully',
-            'data' => json_decode($response->getBody()->getContents())
-        ]);
+        if ($validators->fails()) {
+            return ApiResponse::errorResponse(
+                'some fields are required', $validators->errors()
+            );
+        }
+
+        \DB::beginTransaction();
+        try {
+            $led = Led::create([
+                'shelf_number' => $request->shelf_number,
+                'led_unique_number' => $request->led_unique_number
+            ]);
+
+            $url = 'http://localhost:3000/led/install';
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('POST', $url, [
+                'form_params' => [
+                    'led' => $request->led_number
+                ]
+            ]);
+            return ApiResponse::successResponse('Led Installed', [$response, $led], 201);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse('something went wrong', $e->getMessage());
+        }
+
     }
 
 
     // crud LEDs
-    public function index(){
+    public function index()
+    {
         $leds = Led::all();
+        return ApiResponse::successResponse('leds retrieved', $leds, 200);
+    }
+
+    public function install(Request $request)
+    {
+        $validators = Validator::make($request->all(), [
+            'shelf_number' => 'required',
+            'led_unique_number' => 'required'
+        ]);
+
+        if ($validators->fails()) {
+            return ApiResponse::errorResponse(
+                'some fields are required', $validators->errors()
+            );
+        }
+
+        \DB::beginTransaction();
+        try {
+            $led = Led::create([
+                'shelf_number' => $request->shelf_number,
+                'led_unique_number' => $request->led_unique_number
+            ]);
+            return ApiResponse::successResponse('Led Installed', $led, 201);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse('something went wrong', $e->getMessage());
+        }
     }
 
 }

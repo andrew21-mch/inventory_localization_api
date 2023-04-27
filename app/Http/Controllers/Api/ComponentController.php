@@ -19,7 +19,8 @@ class ComponentController extends Controller
     public function index()
     {
         $components = Component::with('supplier')->get();
-        return ApiResponse::successResponse('components fetched successfully', $components, 200);
+
+        return ApiResponse::successResponse('components fetched successfully', $this->formatComponents($components), 200);
     }
 
     /**
@@ -211,5 +212,29 @@ class ComponentController extends Controller
         $slug = \Str::slug($string);
         $count = Component::where('slug', 'LIKE', "{$slug}%")->count();
         return $count ? "{$slug}-{$count}" : $slug;
+    }
+
+    public static function formatComponents($components)
+    {
+        $formattedComponents = [];
+        foreach($components as $component){
+            $formattedComponents[] = [
+                'id' => $component->id,
+                'name' => $component->name,
+                'quantity' => $component->quantity,
+                'price_per_unit' => $component->price_per_unit,
+                'cost_price_per_unit' => $component->cost_price_per_unit,
+                'description' => $component->description,
+                'image' => $component->image,
+                'slug' => $component->slug,
+                'supplier' => $component->supplier,
+                'led' => $component->led,
+                'created_at' => $component->created_at,
+                'updated_at' => $component->updated_at,
+                'status' => $component->quantity <= 10 ? 'out of stock' : 'in stock'
+            ];
+        }
+
+        return $formattedComponents;
     }
 }
