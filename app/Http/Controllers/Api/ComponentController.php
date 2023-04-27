@@ -231,7 +231,7 @@ class ComponentController extends Controller
                 'led' => $component->led,
                 'created_at' => $component->created_at,
                 'updated_at' => $component->updated_at,
-                'status' => $component->quantity <= 10 ? 'out of stock' : 'in stock'
+                'status' => $component->quantity <= 10 ? 'low' : 'high'
             ];
         }
 
