@@ -13,6 +13,22 @@ When a customer opens the app on their Flutter-powered device, they will be able
 
 This system is expected to simplify the process of locating electronic components in retail shops, making it easier and faster for customers to find what they need. It is also expected to reduce the need for staff assistance, which can lead to increased efficiency and cost savings for the retail shop.
 
+## Architecture
+
+The system follows a client-server architecture, with the server being responsible for managing the data related to the electronic components and their locations within the retail shop. The server will provide endpoints for the mobile and desktop application to retrieve this information and perform searches. The server will also allow for the updating and management of the electronic component data.
+
+The mobile and desktop application will be the primary interface for the end-users of the system. The application will allow users to search for electronic components by name or category and display their location within the retail shop. Users will also be able to scan barcodes of the components to quickly retrieve their location. The mobile application will be available for both Android and iOS devices, while the desktop application will be available for Windows and Mac OS.
+
+The hardware component of the system will consist of an Arduino board with a WiFi module and LED lights attached to it. The Arduino board will be connected to the local WiFi network and will communicate with the server using an API developed using PHP/Laravel. The server will store the location data of each electronic component in the retail shop.
+
+The shop owners will be able to manage their inventory using the mobile and desktop application. They will be able to add, remove, and update the electronic components in stock. They will also be able to view reports on inventory levels, sales, and other key metrics that they can use to make informed decisions about their business.
+
+They will be able to search for electronic components by name, category, or manufacturer. when they select a component, they can click on the "locate" button, which sends an API request to the Arduino microcontroller. The microcontroller then uses the Wi-Fi module to communicate with the LED at the location of the selected component, and the LED lights up, making it easy for the user to locate the component.
+
+### System Architecture Diagram
+
+![System Architecture Diagram](https://github.com/andrew21-mch/inventory_localization_api/blob/69bb5e85b95c9e3aa2a6dd7375ee58613c47f870/public/Architecture2.png)
+
 ## Features
 
 ### Inventory Management
