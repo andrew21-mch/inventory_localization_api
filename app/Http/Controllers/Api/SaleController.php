@@ -17,7 +17,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Sale::all();
+        $sales = Sale::with('component')->get();
         return ApiResponse::successResponse('sales fetched successfully', $sales, 200);
     }
 

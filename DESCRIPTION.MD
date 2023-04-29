@@ -4,8 +4,7 @@ This project aims to develop a system for easily searching and locating electron
 
 The API will be responsible for managing the data related to the electronic components and their locations within the retail shop. It will provide endpoints for the mobile and desktop application to retrieve this information and perform searches. The API will also allow for the updating and management of the electronic component data.
 
-The mobile and desktop application will be the primary interface for the end-users of the system. The application will allow users to search for electronic components by name or category and display their location within the retail shop. Users will also be able to scan barcodes of the components to quickly retrieve their location. The mobile application will be available for both Android and iOS devices, while the desktop application will be available for Windows and Mac OS.
-
+The mobile and desktop application will be the primary interface for the end-users of the system. The application will allow users to search for electronic components by name or category and know their availability in the shop.
 
 The hardware component of the system will consist of an Arduino board with a WiFi module and LED lights attached to it. The Arduino board will be connected to the local WiFi network and will communicate with the server using an API developed using PHP/Laravel. The server will store the location data of each electronic component in the retail shop.
 
