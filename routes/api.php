@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LEDController;
 use App\Http\Controllers\Api\OutOfStockController;
 use App\Http\Controllers\Api\StatisticsController;
 use Illuminate\Http\Request;
@@ -124,6 +125,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/restocks', [StatisticsController::class, 'restocks_statistics']);
         Route::get('/restocks_statistics_by_date', [StatisticsController::class, 'restocks_statistics_by_date']);
         Route::get('/sales_statistics_by_date', [StatisticsController::class, 'sales_statistics_by_date']);
+    });
+
+    // leds
+    Route::prefix('leds')->group(function () {
+        Route::get('/', [LEDController::class, 'index']);
+        Route::get('/{id}/test', [LEDController::class, 'test']);
+        Route::post('/', [LEDController::class, 'install']);
+        Route::put('/{id}', [LEDController::class, 'update']);
+        Route::delete('/{id}', [LEDController::class, 'destroy']);
     });
 
 });

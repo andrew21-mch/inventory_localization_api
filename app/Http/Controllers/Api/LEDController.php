@@ -101,7 +101,8 @@ class LEDController extends Controller
 
         if ($validators->fails()) {
             return ApiResponse::errorResponse(
-                'some fields are required', $validators->errors()
+                'some fields are required', $validators->errors(),
+                400
             );
         }
 
@@ -111,9 +112,12 @@ class LEDController extends Controller
                 'shelf_number' => $request->shelf_number,
                 'led_unique_number' => $request->led_unique_number
             ]);
+
+            \DB::commit();
             return ApiResponse::successResponse('Led Installed', $led, 201);
+
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('something went wrong', $e->getMessage());
+            return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
     }
 
