@@ -121,4 +121,23 @@ class LEDController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $led = Led::find($id);
+        if (!$led) {
+            return ApiResponse::errorResponse('led not found', null, 404);
+        }
+        return ApiResponse::successResponse('led retrieved', $led, 200);
+    }
+
+    public function destroy($id)
+    {
+        $led = Led::find($id);
+        if (!$led) {
+            return ApiResponse::errorResponse('led not found', null, 404);
+        }
+        $led->delete();
+        return ApiResponse::successResponse('led deleted', null, 200);
+    }
+
 }
