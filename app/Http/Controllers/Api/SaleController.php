@@ -86,13 +86,10 @@ class SaleController extends Controller
 
     public function search(Request $request)
     {
-        $sales = Sale::where('quantity', 'like', '%'.$request->search.'%')
-            ->orWhere('total_price', 'like', '%'.$request->search.'%')
-            ->orWhereHas('component', function($query) use ($request){
-                $query->where('name', 'like', '%'.$request->search.'%')
-                ->orWhere('description', 'like', '%'.$request->search.'%');
-            })
-            ->get();
+        $sales = Sale::with('component')->where('quantity', 'like', '%'.$request->search.'%')->orWhereHas('component', function($query) use ($request){
+            $query->where('name', 'like', '%'.$request->search.'%')
+            ->orWhere('description', 'like', '%'.$request->search.'%');
+        })->get();
         return ApiResponse::successResponse('sales searched successfully', $sales, 200);
     }
 }

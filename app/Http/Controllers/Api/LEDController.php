@@ -97,7 +97,7 @@ class LEDController extends Controller
         $leds = Led::where('shelf_number', 'LIKE', '%' . $request->search . '%')
             ->orWhere('led_unique_number', 'LIKE', '%' . $request->search . '%')
             ->get();
-        return ApiResponse::successResponse('leds retrieved', $leds, 200);
+        return ApiResponse::successResponse('leds searched', $leds, 200);
     }
 
     public function install(Request $request)
