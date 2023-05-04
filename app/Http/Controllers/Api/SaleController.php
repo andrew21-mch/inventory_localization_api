@@ -83,4 +83,16 @@ class SaleController extends Controller
         $sale->delete();
         return ApiResponse::successResponse('sale deleted successfully', null, 200);
     }
+
+    public function search(Request $request)
+    {
+        $sales = Sale::where('quantity', 'like', '%'.$request->search.'%')
+            ->orWhere('total_price', 'like', '%'.$request->search.'%')
+            ->orWhereHas('component', function($query) use ($request){
+                $query->where('name', 'like', '%'.$request->search.'%')
+                ->orWhere('description', 'like', '%'.$request->search.'%');
+            })
+            ->get();
+        return ApiResponse::successResponse('sales searched successfully', $sales, 200);
+    }
 }
