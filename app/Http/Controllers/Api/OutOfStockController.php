@@ -42,6 +42,19 @@ class OutOfStockController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $outOfStocks = OutOfStock::whereHas('component', function($query) use ($request){
+            $query->where('name', 'LIKE', "%{$request->search}%")
+            ->orWhere('description', 'LIKE', "%{$request->search}%");
+        })->orWhereHas('supplier', function($query) use ($request){
+            $query->where('name', 'LIKE', "%{$request->search}%")
+            ->orWhere('phone', 'LIKE', "%{$request->search}%");
+        })->with('component', 'supplier')->get();
+        return ApiResponse::successResponse('component fetched successfully', $outOfStocks, 200);
+
+    }
+
     /**
      * Display the specified resource.
      */

@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'restocks'], function () {
         Route::get('/', [RestockController::class, 'index']);
         Route::get('/{id}', [RestockController::class, 'show']);
+        Route::get('/search/restocks', [RestockController::class, 'search']);
         Route::post('/', [RestockController::class, 'store']);
         Route::put('/{id}', [RestockController::class, 'update']);
         Route::delete('/{id}', [RestockController::class, 'destroy']);
@@ -101,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'sales'], function () {
         Route::get('/', [SaleController::class, 'index']);
         Route::get('/{id}', [SaleController::class, 'show']);
+        Route::get('/search/sales', [SaleController::class, 'search']);
         Route::post('/', [SaleController::class, 'store']);
         Route::put('/{id}', [SaleController::class, 'update']);
         Route::delete('/{id}', [SaleController::class, 'destroy']);
@@ -116,6 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('out_of_stocks')->group(function () {
         Route::get('/', [OutOfStockController::class, 'index']);
+        Route::get('/search/out_of_stocks', [OutOfStockController::class, 'search']);
     });
 
 
@@ -131,6 +134,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('leds')->group(function () {
         Route::get('/', [LEDController::class, 'index']);
         Route::get('/{id}/test', [LEDController::class, 'test']);
+        Route::get('/search/leds', [LEDController::class, 'search']);
         Route::post('/', [LEDController::class, 'install']);
         Route::put('/{id}', [LEDController::class, 'update']);
         Route::delete('/{id}', [LEDController::class, 'destroy']);

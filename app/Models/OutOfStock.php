@@ -18,4 +18,9 @@ class OutOfStock extends Model
     {
         return $this->belongsTo(Component::class);
     }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 }

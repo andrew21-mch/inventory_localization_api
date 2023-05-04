@@ -200,7 +200,7 @@ class ComponentController extends Controller
                 }
             }
         }
-        return ApiResponse::successResponse('component fetched successfully', $components, 200);
+        return ApiResponse::successResponse('component fetched successfully', $this->formatComponents($components), 200);
 
     }
 
