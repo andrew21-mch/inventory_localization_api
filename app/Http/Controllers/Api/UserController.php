@@ -11,6 +11,12 @@ class UserController extends Controller
 {
 
     use ApiResponse;
+
+    public function index()
+    {
+        $users = \App\Models\Supplier::all();
+        return ApiResponse::successResponse('suppliers fetched successfully', $users, 200);
+    }
     /**
      * Store a newly created resource in storage.
      */

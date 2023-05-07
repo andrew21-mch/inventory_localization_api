@@ -77,11 +77,11 @@ class StatisticsController extends Controller
                 'quantity' => $item->sum('quantity'),
                 'total_price' => $item->sum('total_price'),
                 'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
-
             ];
-        });
+        })->values()->toArray();
 
         return ApiResponse::successResponse('sales statistics fetched successfully', $sales, 200);
+
     }
 
     public function sales_statistics_by_date(Request $request)

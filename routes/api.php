@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\LEDController;
 use App\Http\Controllers\Api\OutOfStockController;
 use App\Http\Controllers\Api\StatisticsController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -138,6 +139,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [LEDController::class, 'install']);
         Route::put('/{id}', [LEDController::class, 'update']);
         Route::delete('/{id}', [LEDController::class, 'destroy']);
+    });
+
+    // users
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 
 });
