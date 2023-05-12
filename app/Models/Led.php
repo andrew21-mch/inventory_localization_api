@@ -12,7 +12,8 @@ class Led extends Model
 
     protected $fillable = [
         'led_unique_number',
-        'shelf_number'
+        'shelf_number',
+        'status',
     ];
 
     public function components()

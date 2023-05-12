@@ -17,6 +17,7 @@ class Component extends Model
         'slug',
         'price_per_unit',
         'supplier_id',
+        'led_id',
     ];
 
     public function supplier()

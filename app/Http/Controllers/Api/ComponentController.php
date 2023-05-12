@@ -18,7 +18,7 @@ class ComponentController extends Controller
      */
     public function index()
     {
-        $components = Component::with('supplier')->get();
+        $components = Component::with('supplier', 'led')->get();
 
         return ApiResponse::successResponse('components fetched successfully', $this->formatComponents($components), 200);
     }
@@ -73,6 +73,7 @@ class ComponentController extends Controller
                 'slug' => self::createSlug($request->name),
                 'description' => $request->description,
                 'supplier_id' => $request->supplier_id ?? $supplier->id,
+                'led_id' => $request->location
 
             ]);
 

@@ -14,22 +14,53 @@ class LEDController extends Controller
     // make api request to trigger led
     public function triggerLED(Request $request)
     {
-        $url = 'http://localhost:3000/led/trigger';
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request('POST', $url, [
-            'form_params' => [
-                'led' => $request->led_number,
-                'status' => $request->status
-            ]
-        ]);
+        $url = 'http://192.168.0.168/api';
 
-        return response()->json([
-            'success' => true,
-            'message' => 'led triggered successfully',
-            'data' => json_decode($response->getBody()->getContents())
-        ]);
+        $led = Led::find($request->led_id);
+        if (!$led) {
+            return response()->json([
+                'success' => false,
+                'message' => 'LED not found',
+            ]);
+        }
 
+
+        // Create the JSON payload
+        $payload = [
+            'action' => $request->action,
+            'led' => $request->led_number
+        ];
+
+        // Use curl to make the API request
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json'
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Get the HTTP status code
+        curl_close($ch);
+
+
+
+        if ($httpCode === 200) {
+            $led->status = $request->action;
+            $led->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'LED triggered successfully',
+            ]);
+        } else {
+            // Failed response
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to trigger LED',
+                'http_code' => $httpCode
+            ]);
+        }
     }
+
 
     // make api request to get led status
     public function getLEDStatus(Request $request)
@@ -116,13 +147,25 @@ class LEDController extends Controller
 
         \DB::beginTransaction();
         try {
+
             $led = Led::create([
                 'shelf_number' => $request->shelf_number,
                 'led_unique_number' => $request->led_unique_number
             ]);
 
+            $url = 'http://localhost:3000/led/install';
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('POST', $url, [
+                'form_params' => [
+                    'led' => $request->led_number
+                ]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents());
+            $allResponse = [$data, $led];
+
             \DB::commit();
-            return ApiResponse::successResponse('Led Installed', $led, 201);
+            return ApiResponse::successResponse('Led Installed', $allResponse, 201);
 
         } catch (\Exception $e) {
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
@@ -135,7 +178,20 @@ class LEDController extends Controller
         if (!$led) {
             return ApiResponse::errorResponse('led not found', null, 404);
         }
-        return ApiResponse::successResponse('led retrieved', $led, 200);
+
+        // test led
+        $url = 'http://localhost:3000/led/test';
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('POST', $url, [
+            'form_params' => [
+                'led' => $led->led_unique_number
+            ]
+        ]);
+
+        $data = json_decode($response->getBody()->getContents());
+        $allResponse = [$data, $led];
+
+        return ApiResponse::successResponse('led retrieved', $allResponse, 200);
     }
 
     public function destroy($id)
