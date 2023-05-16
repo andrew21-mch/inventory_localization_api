@@ -104,6 +104,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [SaleController::class, 'index']);
         Route::get('/{id}', [SaleController::class, 'show']);
         Route::get('/search/sales', [SaleController::class, 'search']);
+        Route::get('/search/sales_by_date', [SaleController::class, 'filterSales']);
         Route::post('/', [SaleController::class, 'store']);
         Route::put('/{id}', [SaleController::class, 'update']);
         Route::delete('/{id}', [SaleController::class, 'destroy']);

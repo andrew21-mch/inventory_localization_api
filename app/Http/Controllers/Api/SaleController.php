@@ -92,4 +92,20 @@ class SaleController extends Controller
         })->get();
         return ApiResponse::successResponse('sales searched successfully', $sales, 200);
     }
+
+    public function filterSales(Request $request)
+    {
+        $validators = Validator::make($request->all(), [
+            'from' => 'required|date',
+            'to' => 'required|date',
+        ]);
+
+        if ($validators->fails()) {
+            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
+        }
+
+        $sales = Sale::with('component')->whereBetween('created_at', [$request->from, $request->to])->get();
+
+        return ApiResponse::successResponse('sales statistics fetched successfully', $sales, 200);
+    }
 }

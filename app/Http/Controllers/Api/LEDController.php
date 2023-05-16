@@ -28,7 +28,7 @@ class LEDController extends Controller
         // Create the JSON payload
         $payload = [
             'action' => $request->action,
-            'led' => $request->led_number
+            'pinNumber' => $request->pinNumber,
         ];
 
         // Use curl to make the API request
