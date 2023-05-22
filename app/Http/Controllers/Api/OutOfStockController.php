@@ -16,7 +16,7 @@ class OutOfStockController extends Controller
      */
     public function index()
     {
-        $out_of_stocks = OutOfStock::with('component')->get();
+        $out_of_stocks = OutOfStock::with('component', 'supplier')->get();
         return ApiResponse::successResponse('out of stocks fetched successfully', $out_of_stocks, 200);
     }
 
