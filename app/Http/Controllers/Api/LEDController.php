@@ -12,7 +12,7 @@ class LEDController extends Controller
 {
 
     // make api request to trigger led
-    public function triggerLED(Request $request)
+    public static function triggerLED(Request $request)
     {
         $url = 'http://192.168.0.168/api';
 
@@ -61,6 +61,43 @@ class LEDController extends Controller
         }
     }
 
+
+    public static function testLed($id){
+        $url = 'http://192.168.0.168/api';
+
+        $led = Led::find($id);
+        if (!$led) {
+            return response()->json([
+                'success' => false,
+                'message' => 'LED not found',
+            ]);
+        }
+
+
+        // Create the JSON payload
+        $payload = [
+            'action' => 'on',
+            'pinNumber' => $led->led_unique_number,
+        ];
+
+        // Use curl to make the API request
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json'
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Get the HTTP status code
+        curl_close($ch);
+
+        if($httpCode === 200){
+            // Success
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     // make api request to get led status
     public function getLEDStatus(Request $request)
@@ -172,27 +209,6 @@ class LEDController extends Controller
         }
     }
 
-    public function show($id)
-    {
-        $led = Led::find($id);
-        if (!$led) {
-            return ApiResponse::errorResponse('led not found', null, 404);
-        }
-
-        // test led
-        $url = 'http://localhost:3000/led/test';
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request('POST', $url, [
-            'form_params' => [
-                'led' => $led->led_unique_number
-            ]
-        ]);
-
-        $data = json_decode($response->getBody()->getContents());
-        $allResponse = [$data, $led];
-
-        return ApiResponse::successResponse('led retrieved', $allResponse, 200);
-    }
 
     public function destroy($id)
     {

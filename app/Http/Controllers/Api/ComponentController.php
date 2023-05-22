@@ -74,12 +74,40 @@ class ComponentController extends Controller
                 'description' => $request->description,
                 'supplier_id' => $request->supplier_id ?? $supplier->id,
                 'led_id' => $request->location
-
             ]);
 
-            \DB::commit();
 
-            return ApiResponse::successResponse('component created successfully', $component, 201);
+            $ledTriggered = false;
+            if($request->led_id){
+                $ledTriggered = LEDController::testLed($request->led_id);
+            }
+
+            if($component->quantity <= 10){
+                try
+                {
+                    $outOfStock = OutOfStock::where('component_id', $component->id)->first();
+                    if($outOfStock){
+                        $outOfStock->update([
+                            'component_id' => $component->id,
+                            'supplier_id' => $component->supplier_id,
+                        ]);
+                    }else{
+                        OutOfStockController::store($component->id, $component->supplier_id);
+                    }
+                }
+                catch(\Exception $e)
+                {
+                    return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
+                }
+            }
+
+            \DB::commit();
+            if($ledTriggered){
+                return ApiResponse::successResponse('component created successfully', $component, 201);
+            }else{
+                return ApiResponse::successResponse('component created successfully, but led not triggered', $component, 201);
+            }
+
         }catch(\Exception $e){
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
         }
