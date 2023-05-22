@@ -17,23 +17,17 @@ class UserController extends Controller
         $users = \App\Models\Supplier::all();
         return ApiResponse::successResponse('suppliers fetched successfully', $users, 200);
     }
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $user = User::find($id);
         if(!$user){
             return ApiResponse::errorResponse('user not found', null, 404);
         }
+    }
+
+    public function profile(){
+        $profile = auth()->user();
+        return ApiResponse::successResponse('Fetched Profile', $profile, 200);
     }
 
     /**
