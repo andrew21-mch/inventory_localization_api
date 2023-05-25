@@ -159,4 +159,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 
+
 });
+Route::get('expenses', [StatisticsController::class, 'calculateExpenditure']);
+
+

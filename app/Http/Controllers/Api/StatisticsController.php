@@ -38,6 +38,7 @@ class StatisticsController extends Controller
                 'component_name' => $item[0]->component->name,
                 'quantity' => $item->sum('quantity'),
                 'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
+                'expenditure' => $this->calculateExpenditure(),
 
             ];
         });
@@ -63,6 +64,7 @@ class StatisticsController extends Controller
             'restocks_quantity_with_dates' => $restocks_quantity_with_dates,
             'generated_profit_per_component' => $generated_profit_per_component,
             'total_profit' => $total_profits,
+            'expenditure' => $this->calculateExpenditure(),
         ], 200);
     }
 
@@ -77,6 +79,7 @@ class StatisticsController extends Controller
                 'quantity' => $item->sum('quantity'),
                 'total_price' => $item->sum('total_price'),
                 'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
+                'expenditure' => $this->calculateExpenditure(),
             ];
         })->values()->toArray();
 
@@ -104,6 +107,7 @@ class StatisticsController extends Controller
                 'quantity' => $item->sum('quantity'),
                 'total_price' => $item->sum('total_price'),
                 'profit' => $this->calculateProfie($item[0]->component->cost_price_per_unit, $item[0]->component->price_per_unit, $item->sum('quantity')),
+                'expenditure' => $this->calculateExpenditure(),
             ];
         });
 
@@ -137,5 +141,30 @@ class StatisticsController extends Controller
     public function calculateProfie($cost, $price, $quantity)
     {
         return ($price * $quantity) - ($cost * $quantity);
+    }
+
+    public function calculateExpenditure()
+    {
+        $components = Component::all();
+        $sales = Sale::with('component')->get();
+
+        $total = 0;
+
+        foreach ($components as $component) {
+            $total = $component->price_per_unit * $component->quantity;
+        }
+
+
+        // return $sales;
+        $soledExpenseTotal = 0;
+        foreach ($sales as $sale) {
+
+            $soledExpenseTotal += $sale->component->cost_price_per_unit * $sale->quantity;
+
+        }
+
+        $total = $total + $soledExpenseTotal;
+
+        return $total;
     }
 }

@@ -32,7 +32,8 @@ class ComponentController extends Controller
             'name' => 'required|string',
             'quantity' => 'required|integer',
             'description' => 'required|string',
-            'price_per_unit' => 'required',
+            'price_per_unit' => 'required|float',
+            'cost_price_per_unit' => 'required'
         ]);
 
         if ($validators->fails()) {

@@ -16,6 +16,7 @@ class Component extends Model
         'image',
         'slug',
         'price_per_unit',
+        'cost_price_per_unit',
         'supplier_id',
         'led_id',
     ];
