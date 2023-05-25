@@ -74,6 +74,8 @@ Route::get('/', function () {
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
+Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::post('verify-code', [AuthController::class, 'verifyCode']);
 
 Route::group(['prefix' => 'auth', 'middleware' => 'auth:sanctum'], function () {
     Route::post('logout', [AuthController::class, 'logout']);
@@ -151,7 +153,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [UserController::class, 'show']);
         Route::post('/', [UserController::class, 'store']);
         Route::put('/{id}', [UserController::class, 'update']);
+        Route::put('/auth/update-password', [UserController::class, 'updatePassword']);
         Route::delete('/{id}', [UserController::class, 'destroy']);
+
+
     });
 
 });

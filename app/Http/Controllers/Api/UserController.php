@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ApiResponse\ApiResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -33,9 +35,10 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        $user = User::find($id);
+        $user = auth()->user();
+
         if(!$user){
             return ApiResponse::errorResponse('user not found', null, 404);
         }
@@ -48,11 +51,37 @@ class UserController extends Controller
         }
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Update password  for the specified resource in storage.
+     * (current password is required)
      */
-    public function destroy(string $id)
+    public function updatePassword(Request $request)
     {
-        //
+        $validators = Validator::make($request->all(), [
+            'old_password' => 'required|string',
+            'password' => 'required|string|confirmed'
+        ]);
+
+        if ($validators->fails()) {
+            return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
+        }
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return ApiResponse::errorResponse('sorry, old password is incorrect', null, 401);
+        }
+
+        try{
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+
+            return ApiResponse::successResponse('password updated successfully', $user, 200);
+        }catch(\Exception $e){
+            return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
+        }
     }
+
 }
