@@ -24,6 +24,9 @@ The shop owners will be able to manage their inventory using the mobile and desk
 
 They will be able to search for electronic components by name, category, or manufacturer. when they select a component, they can click on the "locate" button, which sends an API request to the Arduino microcontroller. The microcontroller then uses the Wi-Fi module to communicate with the LED at the location of the selected component, and the LED lights up, making it easy for the user to locate the component.
 
+### Database Design Diagram
+![Database Architecture Diagram](https://github.com/andrew21-mch/inventory_localization_api/blob/main/design/smartShop.png)
+
 ### System Architecture Diagram
 
 ![System Architecture Diagram](https://github.com/andrew21-mch/inventory_localization_api/blob/69bb5e85b95c9e3aa2a6dd7375ee58613c47f870/public/Architecture2.png)
