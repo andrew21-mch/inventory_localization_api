@@ -8,7 +8,7 @@ The mobile and desktop application will be the primary interface for the end-use
 
 The hardware component of the system will consist of an Arduino board with a WiFi module and LED lights attached to it. The Arduino board will be connected to the local WiFi network and will communicate with the server using an API developed using PHP/Laravel. The server will store the location data of each electronic component in the retail shop.
 
-When a customer opens the app on their Flutter-powered device, they will be able to see a map of the retail shop, with the locations of the electronic components marked on it. The app will communicate with the server using the API, and the server will send back the location data of each component. The LED lights attached to the Arduino board will be programmed to turn on when the app requests the location of a particular component, making it easier for the customer to locate the desired component.
+The app will communicate with the server using the API, and the server will send back the location data of each component. The LED lights attached to the Arduino board will be programmed to turn on when the app requests the location of a particular component, making it easier for the customer to locate the desired component.
 
 This system is expected to simplify the process of locating electronic components in retail shops, making it easier and faster for customers to find what they need. It is also expected to reduce the need for staff assistance, which can lead to increased efficiency and cost savings for the retail shop.
 
