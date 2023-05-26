@@ -32,8 +32,8 @@ class ComponentController extends Controller
             'name' => 'required|string',
             'quantity' => 'required|integer',
             'description' => 'required|string',
-            'price_per_unit' => 'required|float',
-            'cost_price_per_unit' => 'required'
+            'price_per_unit' => 'required|decimal:0,2',
+            'cost_price_per_unit' => 'required|decimal:0,2'
         ]);
 
         if ($validators->fails()) {
@@ -156,8 +156,8 @@ class ComponentController extends Controller
             $component->update([
                 'name' => $request->name,
                 'quantity' => $request->quantity,
-                'price_per_unit' => $request->price,
-                'cost_price_per_unit' => $request->cost_price,
+                'price_per_unit' => $request->price_per_unit,
+                'cost_price_per_unit' => $request->cost_price_per_unit,
                 'description' => $request->description,
                 'image' => $name,
                 'slug' => \Str::slug($request->name),
