@@ -15,6 +15,7 @@ class User extends Model
         'phone',
         'email',
         'password',
+        'profile_url',
     ];
 
     protected $hidden = [
