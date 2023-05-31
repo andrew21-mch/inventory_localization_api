@@ -31,6 +31,17 @@ class Component extends Model
         return $this->belongsTo(Led::class);
     }
 
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    public function outOfStocks()
+    {
+        return $this->hasMany(OutOfStock::class);
+    }
+
+
 
 
 }

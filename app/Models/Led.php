@@ -11,14 +11,19 @@ class Led extends Model
     use HasFactory;
 
     protected $fillable = [
-        'led_unique_number',
         'shelf_number',
+        'microcontroller_id'.
+        'pin_id',
         'status',
     ];
 
     public function components()
     {
         return $this->hasMany(Component::class);
+    }
+
+    public function pin(){
+        return $this->belongsTo(Pin::class);
     }
 
 }

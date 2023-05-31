@@ -177,13 +177,18 @@ class ComponentController extends Controller
      */
     public function destroy($id)
     {
-        $component = Component::with('led')->find($id);
+        $component = Component::with('led', 'sales', 'outOfStocks')->where('id', $id)->first();
         if(!$component){
             ApiResponse::errorResponse('component not found', null, 404);
         }
 
         \DB::beginTransaction();
         try{
+
+            if($component->sales->count() > 0 || $component->outOfStocks->count() > 0){
+                return ApiResponse::errorResponse('component cannot be deleted because it has sales or out of stock', null, 422);
+            }
+
             $component->delete();
             \DB::commit();
             return ApiResponse::successResponse('component deleted successfully', null, 200);

@@ -137,11 +137,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // leds
     Route::prefix('leds')->group(function () {
         Route::get('/', [LEDController::class, 'index']);
+        Route::get('/microcontrollers/get', [LEDController::class, 'loadMicroncontrollers']);
+        Route::get('/pins/load/{mciId}', [LEDController::class, 'loadPins']);
         Route::get('/{id}/test', [LEDController::class, 'test']);
         Route::post('/', [LEDController::class, 'store']);
         Route::post('/trigger', [LEDController::class, 'triggerLED']);
         Route::get('/search/leds', [LEDController::class, 'search']);
-        // Route::post('/', [LEDController::class, 'install']);
+        Route::post('/', [LEDController::class, 'install']);
         Route::put('/{id}', [LEDController::class, 'update']);
         Route::delete('/{id}', [LEDController::class, 'destroy']);
     });

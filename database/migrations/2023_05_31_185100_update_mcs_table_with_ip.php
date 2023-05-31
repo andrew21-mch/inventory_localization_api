@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leds', function (Blueprint $table) {
-            $table->id();
-            $table->string('shelf_number');
-            $table->timestamps();
+        Schema::table('microcontrollers', function (Blueprint $table) {
+            $table->string('ip_address')->nullable();
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leds');
+        Schema::table('microcontrollers', function (Blueprint $table) {
+            $table->dropColumn('ip_address');
+        });
     }
 };

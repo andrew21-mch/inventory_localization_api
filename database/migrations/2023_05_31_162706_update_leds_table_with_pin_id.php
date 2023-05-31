@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leds', function (Blueprint $table) {
-            $table->id();
-            $table->string('shelf_number');
-            $table->timestamps();
+        Schema::table('leds', function (Blueprint $table) {
+            $table->foreignId('microcontroller_id')->constrained()->nullable();
+            $table->foreignId('pin_id')->constrained()->nullable();
         });
     }
 
@@ -23,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leds');
+        //
     }
 };
