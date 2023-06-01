@@ -51,7 +51,7 @@ class LEDController extends Controller
         }
 
         // Build the API URL
-        $url = 'http://' . $mcu_ip . '/api/';
+        $url = 'http://' . $mcu_ip . '/api';
 
         $led = Led::find($request->led_id);
         if (!$led) {
@@ -139,7 +139,7 @@ class LEDController extends Controller
         }
 
         // Build the API URL
-        $url = 'http://' . $mcu_ip . '/api/';
+        $url = 'http://' . $mcu_ip . '/api';
 
 
         // Create the JSON payload
@@ -205,8 +205,8 @@ class LEDController extends Controller
     {
         $validators = Validator::make($request->all(), [
             'shelf_number' => 'required',
-            'pin_id' => 'required',
-            'microcontroller_id'
+            'pin_id' => 'required|integer',
+            'microcontroller_id' => 'required|integer',
         ]);
 
         if ($validators->fails()) {
@@ -225,7 +225,8 @@ class LEDController extends Controller
             return ApiResponse::errorResponse('microcontroller not found', null);
         }
 
-        $url = 'http://' . $mcu->ip_address . '/api/';
+        $url = 'http://' . $mcu->ip_address . '/api';
+
 
         \DB::beginTransaction();
         try {
@@ -250,21 +251,16 @@ class LEDController extends Controller
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Get the HTTP status code
             curl_close($ch);
 
-            if ($httpCode === 200) {
-                // Success
-                $led->status = 'on';
-                $led->save();
-            } else {
-                return ApiResponse::errorResponse('something went wrong', null, 500);
-            }
-
-            $allResponse = Led::with('microcontroller', 'pin')->get();
-
             \DB::commit();
+
+            if ($httpCode !== 200) {
+                return ApiResponse::errorResponse('something went wrong', $response, 500);
+            }
+            $allResponse = Led::with('microcontroller', 'pin')->get();
             return ApiResponse::successResponse('Led Installed', $allResponse, 201);
 
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
+            return ApiResponse::errorResponse('something went wrong at ex', $e->getMessage(), 500);
         }
     }
 
@@ -284,7 +280,7 @@ class LEDController extends Controller
 
     public function loadPins($mcuId)
     {
-        $pins = Pin::where('microcontroller_id', $mcuId)->first();
+        $pins = Pin::where('microcontroller_id', $mcuId)->get();
         if (!$pins) {
             return ApiResponse::errorResponse('pins not found', null, 404);
         }

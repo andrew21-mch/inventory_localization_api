@@ -12,7 +12,7 @@ class Led extends Model
 
     protected $fillable = [
         'shelf_number',
-        'microcontroller_id'.
+        'microcontroller_id',
         'pin_id',
         'status',
     ];
@@ -24,6 +24,10 @@ class Led extends Model
 
     public function pin(){
         return $this->belongsTo(Pin::class);
+    }
+
+    public function microcontroller(){
+        return $this->belongsTo(Microcontroller::class);
     }
 
 }
