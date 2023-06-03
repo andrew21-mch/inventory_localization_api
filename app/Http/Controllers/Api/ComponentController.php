@@ -40,14 +40,6 @@ class ComponentController extends Controller
             return ApiResponse::errorResponse('some fields are not valid', $validators->errors(), 422);
         }
 
-        $name = null;
-        if($request->hasFile('image')){
-            $image = $request->file('image');
-            $name = time().'.'.$image->getClientOriginalExtension();
-            $destinationPath = public_path('/images');
-            $image->move($destinationPath, $name);
-        }
-
         \DB::beginTransaction();
         try{
             if($request->supplier_id){
@@ -70,7 +62,7 @@ class ComponentController extends Controller
                 'quantity' => $request->quantity,
                 'price_per_unit' => $request->price_per_unit,
                 'cost_price_per_unit' => $request->cost_price_per_unit,
-                'image' => $name,
+                'image' => $request->image_uri,
                 'slug' => self::createSlug($request->name),
                 'description' => $request->description,
                 'supplier_id' => $request->supplier_id ?? $supplier->id,

@@ -19,9 +19,7 @@ class LEDController extends Controller
     {
         // Validate the request
         $validators = Validator::make($request->all(), [
-            'microcontroller_id' => 'required|integer',
             'led_id' => 'required|integer',
-            'pinNumber' => 'required|integer',
         ]);
 
         if ($validators->fails()) {
@@ -32,8 +30,17 @@ class LEDController extends Controller
             ]);
         }
 
+        $led = Led::find($request->led_id);
+        if (!$led) {
+            return response()->json([
+                'success' => false,
+                'message' => 'LED not found',
+            ]);
+        }
+
+
         // Get the MCU
-        $mcu = Microcontroller::find($request->microcontroller_id);
+        $mcu = Microcontroller::find($led->microcontroller_id);
         if (!$mcu) {
             return response()->json([
                 'success' => false,
@@ -53,16 +60,8 @@ class LEDController extends Controller
         // Build the API URL
         $url = 'http://' . $mcu_ip . '/api';
 
-        $led = Led::find($request->led_id);
-        if (!$led) {
-            return response()->json([
-                'success' => false,
-                'message' => 'LED not found',
-            ]);
-        }
-
-        // Get the pin
-        $pin = Pin::where('pinNumber', $request->pinNumber)->where('microcontroller_id', $request->microcontroller_id)->first();
+        // Get the pins
+        $pin = Pin::find($led->pin_id);
 
         if (!$pin) {
             return response()->json([

@@ -151,7 +151,7 @@ class StatisticsController extends Controller
         $total = 0;
 
         foreach ($components as $component) {
-            $total = $component->price_per_unit * $component->quantity;
+            $total = $component->cost_price_per_unit * $component->quantity;
         }
 
 

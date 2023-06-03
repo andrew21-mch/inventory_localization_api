@@ -14,8 +14,8 @@ class Pin extends Model
         'pinNumber',
     ];
 
-    public function m_c_u_s(){
-        return $this->belongsTo(MCU::class);
+    public function microController(){
+        return $this->belongsTo(Microcontroller::class);
     }
 
     public function led(){
