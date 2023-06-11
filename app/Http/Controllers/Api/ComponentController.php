@@ -145,16 +145,16 @@ class ComponentController extends Controller
         \DB::beginTransaction();
         try{
 
+            // update using request->all() will update the slug
             $component->update([
-                'name' => $request->name,
-                'quantity' => $request->quantity,
-                'price_per_unit' => $request->price_per_unit,
-                'cost_price_per_unit' => $request->cost_price_per_unit,
-                'description' => $request->description,
+                'name' => $request->name ?? $component->name,
+                'quantity' => $request->quantity ?? $component->quantity,
+                'price_per_unit' => $request->price_per_unit ?? $component->price_per_unit,
+                'cost_price_per_unit' => $request->cost_price_per_unit ?? $component->cost_price_per_unit,
                 'image' => $name,
-                'slug' => \Str::slug($request->name),
-                'led_id' => $request->led_id
-
+                'description' => $request->description ?? $component->description,
+                'supplier_id' => $request->supplier_id ?? $component->supplier_id,
+                'led_id' => $request->location ?? $component->led_id
             ]);
             \DB::commit();
             return ApiResponse::successResponse('component updated successfully', $component, 200);
@@ -198,6 +198,7 @@ class ComponentController extends Controller
         $components = Component::where('name', 'LIKE', "%{$request->search}%")
         ->orWhere('description', 'LIKE', "%{$request->search}%")
         ->orWhere('quantity', 'LIKE', "%{$request->search}%")
+        ->orWhere('identifier', 'LIKE', "%{$request->search}%")
         ->orWhere('price_per_unit', 'LIKE', "%{$request->search}%")
         ->orWhere('cost_price_per_unit', 'LIKE', "%{$request->search}%")
         ->orWhereHas('supplier', function($query) use ($request){
