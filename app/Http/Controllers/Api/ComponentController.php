@@ -248,6 +248,7 @@ class ComponentController extends Controller
             $formattedComponents[] = [
                 'id' => $component->id,
                 'name' => $component->name,
+                'identifier' => $component->identifier,
                 'quantity' => $component->quantity,
                 'price_per_unit' => $component->price_per_unit,
                 'cost_price_per_unit' => $component->cost_price_per_unit,
