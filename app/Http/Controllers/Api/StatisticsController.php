@@ -167,4 +167,34 @@ class StatisticsController extends Controller
 
         return $total;
     }
+
+
+    public function buildSalesRecommenations()
+    {
+        $sales = Sale::with('component')->get();
+
+        // Group sales by component ID and calculate the total quantity sold for each component
+        $componentSales = $sales->groupBy('component_id')->map(function ($item) {
+            return [
+                'component_id' => $item[0]->component_id,
+                'component_name' => $item[0]->component->name,
+                'total_quantity_sold' => $item->sum('quantity'),
+            ];
+        });
+
+        // Sort the component sales in descending order based on total quantity sold
+        $sortedSales = $componentSales->sortByDesc('total_quantity_sold');
+
+        // Extract the recommended components from the sorted sales
+        $recommendations = $sortedSales->map(function ($item) {
+            return [
+                'component_id' => $item['component_id'],
+                'component_name' => $item['component_name'],
+                'total_quantity_sold' => $item['total_quantity_sold'],
+            ];
+        });
+
+        return ApiResponse::successResponse('sales recommendations built successfully', $recommendations, 200);
+    }
+
 }
