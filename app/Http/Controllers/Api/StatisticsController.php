@@ -179,6 +179,7 @@ class StatisticsController extends Controller
                 'component_id' => $item[0]->component_id,
                 'component_name' => $item[0]->component->name,
                 'total_quantity_sold' => $item->sum('quantity'),
+                'image' => $item[0]->component->image,
             ];
         });
 
@@ -191,6 +192,7 @@ class StatisticsController extends Controller
                 'component_id' => $item['component_id'],
                 'component_name' => $item['component_name'],
                 'total_quantity_sold' => $item['total_quantity_sold'],
+                'image' => $item['image'],
             ];
         });
 
