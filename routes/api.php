@@ -132,7 +132,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/restocks', [StatisticsController::class, 'restocks_statistics']);
         Route::get('/restocks_statistics_by_date', [StatisticsController::class, 'restocks_statistics_by_date']);
         Route::get('/sales_statistics_by_date', [StatisticsController::class, 'sales_statistics_by_date']);
-        Route::get('/recomendations', [StatisticsController::class, 'buildSalesRecommenations']);
+        Route::get('/recommendations', [StatisticsController::class, 'buildSalesRecommenations']);
 
     });
 

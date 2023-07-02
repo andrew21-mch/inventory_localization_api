@@ -31,6 +31,7 @@ class ComponentController extends Controller
         $validators = Validator::make($request->all(), [
             'name' => 'required|string',
             'quantity' => 'required|integer',
+            'unique_identifier' => 'required|string',
             'description' => 'required|string',
             'price_per_unit' => 'required|decimal:0,2',
             'cost_price_per_unit' => 'required|decimal:0,2'
@@ -59,6 +60,7 @@ class ComponentController extends Controller
             }
             $component = Component::create([
                 'name' => $request->name,
+                'identifier' => $request->unique_identifier,
                 'quantity' => $request->quantity,
                 'price_per_unit' => $request->price_per_unit,
                 'cost_price_per_unit' => $request->cost_price_per_unit,
