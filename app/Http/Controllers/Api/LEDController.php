@@ -207,16 +207,15 @@ class LEDController extends Controller
             'pin_id' => 'required|integer',
             'microcontroller_id' => 'required|integer',
         ]);
-
         if ($validators->fails()) {
             return ApiResponse::errorResponse(
-                'some fields are required', $validators->errors()
+                'some fields are required', $validators->errors(), 400
             );
         }
 
         $pin = Pin::find($request->pin_id);
         if (!$pin) {
-            return ApiResponse::errorResponse('pin not found', null);
+            return ApiResponse::errorResponse('pin not found'. $request->pin_id, null);
         }
 
         $mcu = Microcontroller::find($request->microcontroller_id);

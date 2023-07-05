@@ -13,7 +13,7 @@ trait ApiResponse
             'message' => $message,
             'errors' => $errors
 
-        ], $code);
+        ]);
     }
 
     public static function successResponse($message, $data=null, $code=null)
