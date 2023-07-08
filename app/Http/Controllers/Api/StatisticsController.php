@@ -180,6 +180,7 @@ class StatisticsController extends Controller
                 'component_name' => $item[0]->component->name,
                 'total_quantity_sold' => $item->sum('quantity'),
                 'image' => $item[0]->component->image,
+                'price_per_unit' => $item[0]->price_per_unit,
             ];
         });
 
