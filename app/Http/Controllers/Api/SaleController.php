@@ -46,6 +46,7 @@ class SaleController extends Controller
                 'component_id' => $request->component_id,
                 'quantity' => $request->quantity,
                 'total_price' => $request->quantity * $component->price_per_unit,
+                'buyer' => $request->buyer
             ]);
             $component->quantity -= $request->quantity;
             $component->save();

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -44,7 +45,20 @@ class UserController extends Controller
         }
 
         try{
-            $user->update($request->all());
+            $imagePath = null;
+
+            if ($request->has('image')) {
+                $imageData = $request->input('image');
+                $image = base64_decode($imageData);
+                $imagePath = 'profile/' . uniqid() . '.jpg'; // Generate a unique filename
+                Storage::disk('public')->put($imagePath, $image);
+            }
+            $user->update([
+                'name' => $request->name,
+                'phone' => $request-> phone,
+                'email' => $request->email,
+                'profile_url' => $imagePath
+            ]);
             return ApiResponse::successResponse('user updated successfully', $user, 200);
         }catch(\Exception $e){
             return ApiResponse::errorResponse('something went wrong', $e->getMessage(), 500);
